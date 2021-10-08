@@ -1,4 +1,4 @@
-package br.com.zup.dmagliano.ecommerce.commons;
+package br.com.zup.dmagliano.ecommerce.common;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

@@ -1,4 +1,4 @@
-package br.com.zup.dmagliano.ecommerce.customer;
+package br.com.zup.dmagliano.ecommerce.customers;
 
 import br.com.zup.dmagliano.ecommerce.security.PlainPassword;
 

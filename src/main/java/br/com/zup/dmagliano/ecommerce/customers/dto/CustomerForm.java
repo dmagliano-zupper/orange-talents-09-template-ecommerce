@@ -1,7 +1,7 @@
-package br.com.zup.dmagliano.ecommerce.customer.dto;
+package br.com.zup.dmagliano.ecommerce.customers.dto;
 
-import br.com.zup.dmagliano.ecommerce.commons.UniqueValue;
-import br.com.zup.dmagliano.ecommerce.customer.Customer;
+import br.com.zup.dmagliano.ecommerce.common.UniqueValue;
+import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.security.PlainPassword;
 
 import javax.validation.constraints.Email;
