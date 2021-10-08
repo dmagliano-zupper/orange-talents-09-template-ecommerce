@@ -1,9 +1,8 @@
 package br.com.zup.dmagliano.ecommerce.customer.dto;
 
+import br.com.zup.dmagliano.ecommerce.commons.UniqueValue;
 import br.com.zup.dmagliano.ecommerce.customer.Customer;
-import br.com.zup.dmagliano.ecommerce.security.PasswordService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import br.com.zup.dmagliano.ecommerce.security.PlainPassword;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,7 +12,9 @@ public class CustomerForm {
 
     @NotBlank
     private String name;
-    @Email @NotBlank
+    @Email
+    @NotBlank
+    @UniqueValue(fieldName = "email", domainClass = Customer.class)
     private String email;
     @NotBlank @Size(min = 6)
     private String password;
@@ -38,8 +39,8 @@ public class CustomerForm {
         return password;
     }
 
-    public Customer toEntity(PasswordService passwordService) {
-        String encodedPassword = passwordService.encode(this.password);
-        return new Customer(this.email, this.name, encodedPassword);
+    public Customer toEntity() {
+        PlainPassword plainPassword = new PlainPassword(password);
+        return new Customer(this.email, this.name, plainPassword);
     }
 }

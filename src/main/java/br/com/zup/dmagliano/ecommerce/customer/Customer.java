@@ -1,5 +1,7 @@
 package br.com.zup.dmagliano.ecommerce.customer;
 
+import br.com.zup.dmagliano.ecommerce.security.PlainPassword;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,10 +27,10 @@ public class Customer {
 
     private LocalDateTime createDate;
 
-    public Customer(String email, String name, String password) {
+    public Customer(String email, String name, PlainPassword plainPassword) {
         this.email = email;
         this.name = name;
-        this.password = password;
+        this.password = plainPassword.encode();
         this.createDate = LocalDateTime.now();
     }
     @Deprecated
