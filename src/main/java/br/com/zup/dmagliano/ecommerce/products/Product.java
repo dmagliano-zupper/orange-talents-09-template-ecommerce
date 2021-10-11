@@ -2,7 +2,7 @@ package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.categories.Category;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
-import br.com.zup.dmagliano.ecommerce.products.dto.ProductFeatureForm;
+import br.com.zup.dmagliano.ecommerce.products.image.ProductImage;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.CascadeType;
@@ -11,20 +11,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Product {
@@ -51,6 +50,9 @@ public class Product {
     private Customer customer;
     private LocalDateTime createDateTime;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    private Set<ProductImage> productImages = new HashSet<>();
+
     @Deprecated
     public Product() {
     }
@@ -68,5 +70,13 @@ public class Product {
 
     public void setFeatureList(List<ProductFeature> featureList) {
         this.featureList = featureList;
+    }
+
+    public void setImages(Set<String> links) {
+        this.productImages = links.stream().map(link -> new ProductImage(this, link)).collect(Collectors.toSet());
+    }
+
+    public boolean isOwner(Customer customer) {
+        return this.customer.equals(customer);
     }
 }

@@ -1,14 +1,11 @@
 package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductFeatureForm;
-import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -26,6 +23,10 @@ public class ProductFeature {
 
     @ManyToOne
     private Product product;
+
+    @Deprecated
+    public ProductFeature() {
+    }
 
     public ProductFeature(String feature, String description, Product product) {
         this.feature = feature;
