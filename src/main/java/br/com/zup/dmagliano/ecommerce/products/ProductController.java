@@ -6,6 +6,8 @@ import br.com.zup.dmagliano.ecommerce.customers.CustomerRepository;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductForm;
 import br.com.zup.dmagliano.ecommerce.products.image.ImageUploadRequest;
 import br.com.zup.dmagliano.ecommerce.products.image.UploaderFake;
+import br.com.zup.dmagliano.ecommerce.products.ratings.ProductRating;
+import br.com.zup.dmagliano.ecommerce.products.ratings.ProductRatingForm;
 import br.com.zup.dmagliano.ecommerce.security.LoggedCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +48,8 @@ public class ProductController {
 
     @PostMapping("/{id}/images")
     @Transactional
-    public ResponseEntity addImage(@PathVariable("id") Long id, ImageUploadRequest imageUploadRequest, @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
+    public ResponseEntity addImage(@PathVariable("id") Long id, ImageUploadRequest imageUploadRequest,
+                                   @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
         /*
           1- Enviar imagens para hospedagem
           2- Obter os links das imagens
@@ -54,12 +57,12 @@ public class ProductController {
           4- Carregar o produto
           5- Atualizar nova versão do produto
         */
-        Customer customer = customerRepository.findByEmail(loggedCustomer.getUsername());
+        Customer customer = getCustomer(loggedCustomer);
 
         Set<String> links = uploaderFake.send(imageUploadRequest.getImages());
-        Product product = productRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Produto não encontrado ou id invalida"));
-        if (!product.isOwner(customer)){
+
+        Product product = getProduct(id);
+        if (!product.isOwner(customer)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         product.setImages(links);
@@ -67,6 +70,29 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/ratings")
+    @Transactional
+    public ResponseEntity create(@PathVariable("id") Long id, @RequestBody @Valid ProductRatingForm ratingForm,
+                                 @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
+        Customer customer = getCustomer(loggedCustomer);
+        Product product = getProduct(id);
+
+        ProductRating productRating = ratingForm.toEntity(product, customer);
+        product.addRatings(productRating);
+        productRepository.save(product);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    private Customer getCustomer(LoggedCustomer loggedCustomer) {
+        return customerRepository.findByEmail(loggedCustomer.getUsername());
+    }
+
+    private Product getProduct(Long id){
+        return productRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Produto não encontrado ou id invalida"));
+    }
 
 }
 

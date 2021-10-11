@@ -3,6 +3,7 @@ package br.com.zup.dmagliano.ecommerce.products;
 import br.com.zup.dmagliano.ecommerce.categories.Category;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.products.image.ProductImage;
+import br.com.zup.dmagliano.ecommerce.products.ratings.ProductRating;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.CascadeType;
@@ -53,6 +54,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
     private Set<ProductImage> productImages = new HashSet<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    private Set<ProductRating> productRatings = new HashSet<>();
+
     @Deprecated
     public Product() {
     }
@@ -74,6 +78,10 @@ public class Product {
 
     public void setImages(Set<String> links) {
         this.productImages = links.stream().map(link -> new ProductImage(this, link)).collect(Collectors.toSet());
+    }
+
+    public void addRatings(ProductRating productRating){
+        this.productRatings.add(productRating);
     }
 
     public boolean isOwner(Customer customer) {

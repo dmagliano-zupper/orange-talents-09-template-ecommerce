@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,13 @@ public class ValidationErrorHandler {
         });
 
         return errosDto;
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ErrorDTO entityNotFound(EntityNotFoundException exception) {
+
+        return new ErrorDTO("Id",exception.getLocalizedMessage());
     }
 
 }

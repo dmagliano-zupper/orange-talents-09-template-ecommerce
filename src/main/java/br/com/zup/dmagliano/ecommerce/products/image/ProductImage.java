@@ -21,6 +21,7 @@ public class ProductImage {
     @NotNull
     @ManyToOne
     private Product product;
+
     @URL
     @NotBlank
     private String link;
