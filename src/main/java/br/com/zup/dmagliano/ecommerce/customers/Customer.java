@@ -37,6 +37,10 @@ public class Customer {
     public Customer() {
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -1,9 +1,11 @@
 package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.categories.CategoryRepository;
+import br.com.zup.dmagliano.ecommerce.common.EmailSenderFake;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.customers.CustomerRepository;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductForm;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductQuestionForm;
 import br.com.zup.dmagliano.ecommerce.products.image.ImageUploadRequest;
 import br.com.zup.dmagliano.ecommerce.products.image.UploaderFake;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductRatingForm;
@@ -35,11 +37,16 @@ public class ProductController {
     CustomerRepository customerRepository;
     @Autowired
     UploaderFake uploaderFake;
+    @Autowired
+    EmailSenderFake emailSenderFake;
+
+
 
     @PostMapping
     @Transactional
     public ResponseEntity createProduct(@RequestBody @Valid ProductForm productForm, @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
-        Customer customer = customerRepository.findByEmail(loggedCustomer.getUsername());
+        Customer customer = getCustomerByEmail(loggedCustomer);
+
         Product product = productForm.toEntity(customer, categoryRepository);
         productRepository.save(product);
         return ResponseEntity.ok().build();
@@ -49,18 +56,12 @@ public class ProductController {
     @Transactional
     public ResponseEntity addImage(@PathVariable("id") Long id, ImageUploadRequest imageUploadRequest,
                                    @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
-        /*
-          1- Enviar imagens para hospedagem
-          2- Obter os links das imagens
-          3- Associar os links com os produtos em questão
-          4- Carregar o produto
-          5- Atualizar nova versão do produto
-        */
-        Customer customer = getCustomer(loggedCustomer);
+
+        Customer customer = getCustomerByEmail(loggedCustomer);
 
         Set<String> links = uploaderFake.send(imageUploadRequest.getImages());
 
-        Product product = getProduct(id);
+        Product product = getProductById(id);
         if (!product.isOwner(customer)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -69,12 +70,13 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+
     @PostMapping("/{id}/ratings")
     @Transactional
     public ResponseEntity create(@PathVariable("id") Long id, @RequestBody @Valid ProductRatingForm ratingForm,
                                  @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
-        Customer customer = getCustomer(loggedCustomer);
-        Product product = getProduct(id);
+        Customer customer = getCustomerByEmail(loggedCustomer);
+        Product product = getProductById(id);
 
         ProductRating productRating = ratingForm.toEntity(product, customer);
         product.addRatings(productRating);
@@ -84,14 +86,32 @@ public class ProductController {
     }
 
 
-    private Customer getCustomer(LoggedCustomer loggedCustomer) {
+    @PostMapping("/{id}/questions")
+    @Transactional
+    public ResponseEntity create(@PathVariable("id") Long id, @RequestBody @Valid ProductQuestionForm questionForm,
+                                 @AuthenticationPrincipal LoggedCustomer loggedCustomer) {
+
+        Customer customer = getCustomerByEmail(loggedCustomer);
+        Product product = getProductById(id);
+
+        ProductQuestion productQuestion = questionForm.toEntity(product, customer);
+        product.addQuestion(productQuestion);
+        emailSenderFake.notifyQuestion(productQuestion);
+        productRepository.save(product);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    private Customer getCustomerByEmail(LoggedCustomer loggedCustomer) {
         return customerRepository.findByEmail(loggedCustomer.getUsername());
     }
 
-    private Product getProduct(Long id) {
+    private Product getProductById(Long id) {
         return productRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Produto não encontrado ou id invalida"));
     }
+
 
 }
 

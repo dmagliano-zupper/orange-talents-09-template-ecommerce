@@ -20,6 +20,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +43,7 @@ public class Product {
     private String description;
     @Size(min = 3)
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
-    private List<ProductFeature> featureList;
+    private List<ProductFeature> featureList = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
@@ -56,7 +57,12 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
     private Set<ProductRating> productRatings = new HashSet<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    private List<ProductQuestion> productQuestionList = new ArrayList<>();
 
+    public String getName() {
+        return name;
+    }
 
     @Deprecated
     public Product() {
@@ -74,18 +80,28 @@ public class Product {
     }
 
     public void setFeatureList(List<ProductFeature> featureList) {
+
         this.featureList = featureList;
     }
 
     public void setImages(Set<String> links) {
-        this.productImages = links.stream().map(link -> new ProductImage(this, link)).collect(Collectors.toSet());
+        this.productImages = links.stream().map(
+                        link -> new ProductImage(this, link))
+                .collect(Collectors.toSet());
     }
 
-    public void addRatings(ProductRating productRating){
+    public void addRatings(ProductRating productRating) {
+
         this.productRatings.add(productRating);
     }
 
+    public void addQuestion(ProductQuestion productQuestion) {
+
+        this.productQuestionList.add(productQuestion);
+    }
+
     public boolean isOwner(Customer customer) {
+
         return this.customer.equals(customer);
     }
 }
