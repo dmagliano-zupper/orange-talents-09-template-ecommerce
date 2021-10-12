@@ -6,8 +6,7 @@ import br.com.zup.dmagliano.ecommerce.customers.CustomerRepository;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductForm;
 import br.com.zup.dmagliano.ecommerce.products.image.ImageUploadRequest;
 import br.com.zup.dmagliano.ecommerce.products.image.UploaderFake;
-import br.com.zup.dmagliano.ecommerce.products.ratings.ProductRating;
-import br.com.zup.dmagliano.ecommerce.products.ratings.ProductRatingForm;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductRatingForm;
 import br.com.zup.dmagliano.ecommerce.security.LoggedCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,7 +88,7 @@ public class ProductController {
         return customerRepository.findByEmail(loggedCustomer.getUsername());
     }
 
-    private Product getProduct(Long id){
+    private Product getProduct(Long id) {
         return productRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Produto não encontrado ou id invalida"));
     }

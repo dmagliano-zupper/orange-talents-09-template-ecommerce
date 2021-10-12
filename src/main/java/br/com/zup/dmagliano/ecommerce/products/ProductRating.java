@@ -1,4 +1,4 @@
-package br.com.zup.dmagliano.ecommerce.products.ratings;
+package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.products.Product;

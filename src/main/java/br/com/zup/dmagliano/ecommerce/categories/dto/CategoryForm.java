@@ -1,5 +1,7 @@
-package br.com.zup.dmagliano.ecommerce.categories;
+package br.com.zup.dmagliano.ecommerce.categories.dto;
 
+import br.com.zup.dmagliano.ecommerce.categories.Category;
+import br.com.zup.dmagliano.ecommerce.categories.CategoryRepository;
 import br.com.zup.dmagliano.ecommerce.common.ExistingId;
 import br.com.zup.dmagliano.ecommerce.common.UniqueValue;
 import com.fasterxml.jackson.annotation.JsonProperty;

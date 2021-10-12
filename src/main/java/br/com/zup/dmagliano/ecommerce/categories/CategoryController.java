@@ -1,5 +1,6 @@
 package br.com.zup.dmagliano.ecommerce.categories;
 
+import br.com.zup.dmagliano.ecommerce.categories.dto.CategoryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,8 +1,8 @@
-package br.com.zup.dmagliano.ecommerce.products.ratings;
+package br.com.zup.dmagliano.ecommerce.products.dto;
 
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.products.Product;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import br.com.zup.dmagliano.ecommerce.products.ProductRating;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
