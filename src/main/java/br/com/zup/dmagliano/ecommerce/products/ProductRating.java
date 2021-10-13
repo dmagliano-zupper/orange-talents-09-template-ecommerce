@@ -1,16 +1,14 @@
 package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
-import br.com.zup.dmagliano.ecommerce.products.Product;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductRatingDto;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -44,11 +42,23 @@ public class ProductRating {
     public ProductRating() {
     }
 
+    public ProductRatingDto toRatingDto(){
+        return new ProductRatingDto(
+                this.rating,
+                this.title,
+                this.description
+        );
+    }
+
     public ProductRating(Integer rating, String title, String description, Product product, Customer customer) {
         this.rating = rating;
         this.title = title;
         this.description = description;
         this.product = product;
         this.customer = customer;
+    }
+
+    public Integer getRating() {
+        return rating;
     }
 }

@@ -1,6 +1,7 @@
 package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductQuestionDto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +40,12 @@ public class ProductQuestion {
     public ProductQuestion() {
     }
 
+    public ProductQuestion(String title, Product product, Customer customer) {
+        this.title = title;
+        this.product = product;
+        this.customer = customer;
+    }
+
     public Long getId() {
         return id;
     }
@@ -55,9 +62,7 @@ public class ProductQuestion {
         return customer;
     }
 
-    public ProductQuestion(String title, Product product, Customer customer) {
-        this.title = title;
-        this.product = product;
-        this.customer = customer;
+    public ProductQuestionDto toQuestionDto() {
+        return new ProductQuestionDto(this.title);
     }
 }

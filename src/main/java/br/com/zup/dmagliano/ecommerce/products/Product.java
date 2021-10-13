@@ -2,6 +2,9 @@ package br.com.zup.dmagliano.ecommerce.products;
 
 import br.com.zup.dmagliano.ecommerce.categories.Category;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductDetailsDto;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductFeatureDto;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductQuestionDto;
 import br.com.zup.dmagliano.ecommerce.products.image.ProductImage;
 import org.hibernate.validator.constraints.Length;
 
@@ -103,5 +106,34 @@ public class Product {
     public boolean isOwner(Customer customer) {
 
         return this.customer.equals(customer);
+    }
+
+    private Set<String> getImagesSet(){
+        return this.productImages.stream().map(productImage -> productImage.getLink()).collect(Collectors.toSet());
+    }
+
+    private ProductRatingSet getRatingSet(){
+        return new ProductRatingSet(this.productRatings);
+    }
+
+    private Set<ProductFeatureDto> toFeatureDto(){
+        return this.featureList.stream().map(ProductFeature::toRatingDto).collect(Collectors.toSet());
+    }
+
+    private Set<ProductQuestionDto> toQuestionDto(){
+        return this.productQuestionList.stream().map(ProductQuestion::toQuestionDto)
+                .collect(Collectors.toSet());
+    }
+
+    public ProductDetailsDto toProductDetails() {
+        return new ProductDetailsDto(
+                this.name,
+                this.sellPrice,
+                getImagesSet(),
+                toFeatureDto(),
+                this.description,
+                toQuestionDto(),
+                getRatingSet()
+        );
     }
 }

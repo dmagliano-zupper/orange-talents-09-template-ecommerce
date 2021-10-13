@@ -35,4 +35,7 @@ public class ProductImage {
         this.link = link;
     }
 
+    public String getLink() {
+        return link;
+    }
 }

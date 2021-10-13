@@ -45,20 +45,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers(HttpMethod.POST, "/customers").permitAll()
-                    .antMatchers("/auth/**").permitAll()
-                    .anyRequest().authenticated()
+                .antMatchers(HttpMethod.POST, "/customers").permitAll()
+                .antMatchers(HttpMethod.GET, "/products/**/details").permitAll()
+                .antMatchers("/auth/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
-                    .cors()
+                .cors()
                 .and()
-                    .csrf().disable()
+                .csrf().disable()
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .addFilterBefore(new JwtAuthenticationFilter(tokenManager, usersService),
-                            UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(tokenManager, usersService),
+                        UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
-                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint());
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint());
 
     }
 

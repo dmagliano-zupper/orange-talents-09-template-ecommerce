@@ -4,6 +4,7 @@ import br.com.zup.dmagliano.ecommerce.categories.CategoryRepository;
 import br.com.zup.dmagliano.ecommerce.common.EmailSenderFake;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.customers.CustomerRepository;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductDetailsDto;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductForm;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductQuestionForm;
 import br.com.zup.dmagliano.ecommerce.products.image.ImageUploadRequest;
@@ -14,10 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityNotFoundException;
@@ -102,9 +105,17 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/details")
+    public ResponseEntity<ProductDetailsDto> details(@PathVariable("id") Long id){
+        Product product = getProductById(id);
+        ProductDetailsDto productDetailsDto = product.toProductDetails();
+        return ResponseEntity.ok().body(productDetailsDto);
+    }
+
 
     private Customer getCustomerByEmail(LoggedCustomer loggedCustomer) {
-        return customerRepository.findByEmail(loggedCustomer.getUsername());
+        return customerRepository.findByEmail(loggedCustomer.getUsername()).orElseThrow(
+                () -> new EntityNotFoundException("Usuário com email informado não encontrado"));
     }
 
     private Product getProductById(Long id) {

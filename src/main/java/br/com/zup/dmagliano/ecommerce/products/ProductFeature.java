@@ -1,6 +1,8 @@
 package br.com.zup.dmagliano.ecommerce.products;
 
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductFeatureDto;
 import br.com.zup.dmagliano.ecommerce.products.dto.ProductFeatureForm;
+import br.com.zup.dmagliano.ecommerce.products.dto.ProductRatingDto;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,5 +40,9 @@ public class ProductFeature {
         this.feature = productFeatureForm.getFeature();
         this.description = productFeatureForm.getDescription();
         this.product = product;
+    }
+
+    public ProductFeatureDto toRatingDto(){
+        return new ProductFeatureDto(this.feature, this.description);
     }
 }
