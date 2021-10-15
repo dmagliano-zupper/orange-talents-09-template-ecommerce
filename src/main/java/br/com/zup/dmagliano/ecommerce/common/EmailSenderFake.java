@@ -22,6 +22,7 @@ public class EmailSenderFake {
         System.out.println("##########################################################");
         System.out.println("Email enviado para " + email);
         System.out.println("Olá " + name + " há uma nova pergunta sobre " + productName);
+        System.out.println("Responda: " + productQuestion.getTitle());
         System.out.println("##########################################################");
     }
 
@@ -31,7 +32,7 @@ public class EmailSenderFake {
         String sellerEmail = seller.getEmail();
         String sellerName = seller.getName();
         String productName = order.getProduct().getName();
-        String orderId = order.getOrderId().toString();
+        String orderId = order.getId().toString();
 
         System.out.println("##########################################################");
         System.out.println("Email enviado para " + sellerEmail);

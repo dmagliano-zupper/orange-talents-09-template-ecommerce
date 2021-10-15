@@ -40,7 +40,7 @@ public class Product {
     @DecimalMin(value = "0.00", inclusive = false)
     @Positive
     private BigDecimal sellPrice;
-    @Min(1)
+    @Min(0)
     private Integer quantity;
     @Length(max = 1000)
     private String description;
@@ -151,5 +151,9 @@ public class Product {
         } else {
             return false;
         }
+    }
+
+    public void removeSold(Integer soldQuantity) {
+        this.quantity -= soldQuantity;
     }
 }
