@@ -23,7 +23,7 @@ public class ProductRating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Min(1)
+    @Min(0)
     @Max(5)
     private Integer rating;
     @NotBlank

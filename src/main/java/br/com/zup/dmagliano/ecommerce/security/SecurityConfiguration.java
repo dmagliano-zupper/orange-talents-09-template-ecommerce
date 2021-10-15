@@ -71,8 +71,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/**.html", "/v2/api-docs", "/webjars/**",
-                "/configuration/**", "/swagger-resources/**", "/css/**", "/**.ico", "/js/**");
+        web.ignoring().antMatchers("/**.html", "/v3/api-docs/**", "/webjars/**",
+                "/configuration/**", "/swagger-ui/**", "/css/**", "/**.ico", "/js/**");
     }
 
     private static class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
