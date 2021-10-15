@@ -51,7 +51,7 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
     @ManyToOne
-    private Customer customer;
+    private Customer seller;
     private LocalDateTime createDateTime;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
@@ -63,23 +63,31 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
     private List<ProductQuestion> productQuestionList = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
-
     @Deprecated
     public Product() {
     }
 
     public Product(String name, BigDecimal sellPrice, Integer quantity, String description,
-                   Category category, Customer customer) {
+                   Category category, Customer seller) {
         this.name = name;
         this.sellPrice = sellPrice;
         this.quantity = quantity;
         this.description = description;
         this.category = category;
-        this.customer = customer;
+        this.seller = seller;
         this.createDateTime = LocalDateTime.now();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BigDecimal getSellPrice() {
+        return sellPrice;
+    }
+
+    public Customer getSeller(){
+       return this.seller;
     }
 
     public void setFeatureList(List<ProductFeature> featureList) {
@@ -105,22 +113,22 @@ public class Product {
 
     public boolean isOwner(Customer customer) {
 
-        return this.customer.equals(customer);
+        return this.seller.equals(customer);
     }
 
-    private Set<String> getImagesSet(){
+    private Set<String> getImagesSet() {
         return this.productImages.stream().map(productImage -> productImage.getLink()).collect(Collectors.toSet());
     }
 
-    private ProductRatingSet getRatingSet(){
+    private ProductRatingSet getRatingSet() {
         return new ProductRatingSet(this.productRatings);
     }
 
-    private Set<ProductFeatureDto> toFeatureDto(){
+    private Set<ProductFeatureDto> toFeatureDto() {
         return this.featureList.stream().map(ProductFeature::toRatingDto).collect(Collectors.toSet());
     }
 
-    private Set<ProductQuestionDto> toQuestionDto(){
+    private Set<ProductQuestionDto> toQuestionDto() {
         return this.productQuestionList.stream().map(ProductQuestion::toQuestionDto)
                 .collect(Collectors.toSet());
     }
@@ -135,5 +143,13 @@ public class Product {
                 toQuestionDto(),
                 getRatingSet()
         );
+    }
+
+    public boolean isQuantityAvailable(Integer quantity) {
+        if (this.quantity.compareTo(quantity) >= 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
