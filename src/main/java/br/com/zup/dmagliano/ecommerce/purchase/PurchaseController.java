@@ -2,15 +2,16 @@ package br.com.zup.dmagliano.ecommerce.purchase;
 
 import br.com.zup.dmagliano.ecommerce.common.EmailSenderFake;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
-import br.com.zup.dmagliano.ecommerce.customers.CustomerRepository;
 import br.com.zup.dmagliano.ecommerce.products.Product;
 import br.com.zup.dmagliano.ecommerce.products.ProductRepository;
+import br.com.zup.dmagliano.ecommerce.purchase.dto.PurchaseOrderDto;
+import br.com.zup.dmagliano.ecommerce.purchase.dto.PurchaseOrderForm;
 import br.com.zup.dmagliano.ecommerce.security.LoggedCustomer;
-import com.fasterxml.jackson.core.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,8 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/purchase")
@@ -61,4 +64,11 @@ public class PurchaseController {
         return ResponseEntity.status(HttpStatus.FOUND).location(purchase.getPaymentURL(uri)).build();
     }
 
+    @GetMapping(value = "/all")
+    public ResponseEntity getAllOrders(){
+
+        List<PurchaseOrderDto> purchaseOrderDtoList = purchaseRepository.findAll().stream()
+                .map(purchaseOrder -> purchaseOrder.toDto()).collect(Collectors.toList());
+        return ResponseEntity.ok().body(purchaseOrderDtoList);
+    }
 }

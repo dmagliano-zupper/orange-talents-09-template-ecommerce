@@ -1,4 +1,6 @@
-package br.com.zup.dmagliano.ecommerce.purchase;
+package br.com.zup.dmagliano.ecommerce.purchase.dto;
+
+import br.com.zup.dmagliano.ecommerce.purchase.PaymentMethod;
 
 public class PurchaseOrderForm {
 
