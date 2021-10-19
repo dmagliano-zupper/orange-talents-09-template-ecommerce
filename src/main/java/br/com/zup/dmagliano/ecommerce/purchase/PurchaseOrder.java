@@ -3,10 +3,8 @@ package br.com.zup.dmagliano.ecommerce.purchase;
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.products.Product;
 import br.com.zup.dmagliano.ecommerce.purchase.dto.PurchaseOrderDto;
-import br.com.zup.dmagliano.ecommerce.transaction.GatewayTransactionResponse;
 import br.com.zup.dmagliano.ecommerce.transaction.Transaction;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -62,6 +60,7 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.MERGE)
     private Set<Transaction> transactionSet = new HashSet<>();
 
+
     @Deprecated
     public PurchaseOrder() {
     }
@@ -108,6 +107,7 @@ public class PurchaseOrder {
                 this.id,
                 this.product.getName(),
                 this.buyer.getName(),
+                this.product.getSeller().getName(),
                 this.quantity,
                 this.agreedPrice,
                 this.totalPrice,
@@ -125,11 +125,10 @@ public class PurchaseOrder {
         if (!isStatusFinished()){this.orderStatus = OrderStatus.FINISHED;}
     }
 
-    public void addTransactionAttempt(GatewayTransactionResponse gatewayTransactionResponse) {
-        Transaction transaction = gatewayTransactionResponse.toTransaction(this);
-        this.transactionSet.add(transaction);
+    public void addTransactionAttempt(Transaction transaction) {
         if (transaction.isSucess()){
             this.setStatusFinished();
         }
+        this.transactionSet.add(transaction);
     }
 }

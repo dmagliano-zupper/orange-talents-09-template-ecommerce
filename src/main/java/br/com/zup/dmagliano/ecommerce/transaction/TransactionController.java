@@ -1,5 +1,7 @@
 package br.com.zup.dmagliano.ecommerce.transaction;
 
+import br.com.zup.dmagliano.ecommerce.others.Invoice;
+import br.com.zup.dmagliano.ecommerce.others.Ranking;
 import br.com.zup.dmagliano.ecommerce.purchase.PurchaseOrder;
 import br.com.zup.dmagliano.ecommerce.purchase.PurchaseRepository;
 import br.com.zup.dmagliano.ecommerce.transaction.dto.PagSeguroTransactionResponse;
@@ -23,6 +25,10 @@ public class TransactionController {
 
     @Autowired
     PurchaseRepository purchaseRepository;
+    @Autowired
+    private Invoice invoice;
+    @Autowired
+    private Ranking ranking;
 
 
     @PostMapping("/paypal/{orderId}")
@@ -40,20 +46,25 @@ public class TransactionController {
         return processGatewayTransactionResponse(orderId, pagSeguroTransaction);
     }
 
+
     private ResponseEntity processGatewayTransactionResponse(String orderId, GatewayTransactionResponse gatewayTransactionResponse) {
 
         PurchaseOrder purchase = purchaseRepository.findById(UUID.fromString(orderId)).orElseThrow(EntityNotFoundException::new);
-
         if (purchase.isStatusFinished()) {
             return ResponseEntity.badRequest().body("Transação já concluida");
         }
 
-        purchase.addTransactionAttempt(gatewayTransactionResponse);
-        purchaseRepository.save(purchase);
+        Transaction transaction = gatewayTransactionResponse.toTransaction(purchase);
+        purchase.addTransactionAttempt(transaction);
+        purchaseRepository.saveAndFlush(purchase);
+        if (transaction.isSucess()) {
+            System.out.println("Invoice requested to order " + purchase.getId());
+            invoice.process(purchase.toDto());
+            System.out.println("Ranking points added to " + purchase.getSeller().getName());
+            ranking.process(purchase.toDto());
+        }
 
         return ResponseEntity.ok().build();
-
-
     }
 
 }
