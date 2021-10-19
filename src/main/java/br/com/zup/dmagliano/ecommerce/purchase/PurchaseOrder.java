@@ -2,10 +2,15 @@ package br.com.zup.dmagliano.ecommerce.purchase;
 
 import br.com.zup.dmagliano.ecommerce.customers.Customer;
 import br.com.zup.dmagliano.ecommerce.products.Product;
+import br.com.zup.dmagliano.ecommerce.purchase.dto.PurchaseOrderDto;
+import br.com.zup.dmagliano.ecommerce.transaction.GatewayTransactionResponse;
+import br.com.zup.dmagliano.ecommerce.transaction.Transaction;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,19 +20,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 public class PurchaseOrder {
 
     @Id
+    @Column(name = "id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "UUID")
     @GenericGenerator(
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne
@@ -50,7 +59,12 @@ public class PurchaseOrder {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.STARTED;
 
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.MERGE)
+    private Set<Transaction> transactionSet = new HashSet<>();
 
+    @Deprecated
+    public PurchaseOrder() {
+    }
 
     public PurchaseOrder(Product product, Customer buyer, Integer quantity, BigDecimal agreedPrice, PaymentMethod paymentMethod) {
         this.product = product;
@@ -87,5 +101,35 @@ public class PurchaseOrder {
                 .buildAndExpand(this.id,purchaseUri.toString());
 
         return uriComponents.toUri();
+    }
+
+    public PurchaseOrderDto toDto(){
+        return new PurchaseOrderDto(
+                this.id,
+                this.product.getName(),
+                this.buyer.getName(),
+                this.quantity,
+                this.agreedPrice,
+                this.totalPrice,
+                this.paymentMethod,
+                this.orderStatus,
+                this.transactionSet.stream().map(Transaction::toDto).collect(Collectors.toSet())
+        );
+    }
+
+    public Boolean isStatusFinished(){
+        return this.orderStatus.equals(OrderStatus.FINISHED) ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    private void setStatusFinished(){
+        if (!isStatusFinished()){this.orderStatus = OrderStatus.FINISHED;}
+    }
+
+    public void addTransactionAttempt(GatewayTransactionResponse gatewayTransactionResponse) {
+        Transaction transaction = gatewayTransactionResponse.toTransaction(this);
+        this.transactionSet.add(transaction);
+        if (transaction.isSucess()){
+            this.setStatusFinished();
+        }
     }
 }
